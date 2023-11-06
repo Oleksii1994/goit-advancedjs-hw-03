@@ -9,7 +9,7 @@ export function fetchBreeds() {
   return axios
     .get('https://api.thecatapi.com/v1/breeds')
     .then(response => {
-      if (!response) {
+      if (!response.data) {
         throw new Error();
       }
 
@@ -18,10 +18,9 @@ export function fetchBreeds() {
     .catch(error => {
       console.log(error);
       iziToast.error({
-        message: 'Oops! Something went wrong! Try reloading the page!',
+        message: 'Oops! Something went wrong! Try to reload the page!',
         position: 'topRight',
       });
-      return [];
     });
 }
 
@@ -29,7 +28,7 @@ export function fetchCatByBreed(breedId) {
   return axios
     .get(`https://api.thecatapi.com/v1/images/search?breed_ids=${breedId}`)
     .then(response => {
-      if (!response) {
+      if (!response.data) {
         throw new Error();
       }
       return response.data;
@@ -37,9 +36,8 @@ export function fetchCatByBreed(breedId) {
     .catch(error => {
       console.log(error);
       iziToast.error({
-        message: 'Oops! Something went wrong! Try reloading the page!',
+        message: 'Oops! Something went wrong! Try to reload the page!',
         position: 'topRight',
       });
-      return null;
     });
 }

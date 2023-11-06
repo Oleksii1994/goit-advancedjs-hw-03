@@ -14,8 +14,14 @@ li {
   padding: 0;
 }
 
+img {
+  box-sizing: border-box;
+
+  object-fit: cover;
+}
+
 p {
-  line-height: 1.4;
+  line-height: 1.6;
 }
 
 select {
@@ -61,10 +67,6 @@ select {
   }
 }
 
-#ss-zx01uszl {
-  margin-bottom: 24px;
-}
-
 .ss-hide {
   display: none !important;
 }
@@ -74,6 +76,8 @@ select {
   position: relative;
   user-select: none;
   color: var(--ss-font-color);
+
+  margin-bottom: 24px;
   min-height: var(--ss-main-height);
   width: 16%;
   padding: var(--ss-spacing-s);
@@ -522,7 +526,11 @@ select {
   border-radius: 50%;
   display: inline-block;
   position: relative;
-  background: linear-gradient(0deg, rgba(255, 61, 0, 0.2) 33%, #ff3d00 100%);
+  background: linear-gradient(
+    0deg,
+    rgba(255, 255, 255, 0.533) 33%,
+    #0196d7 100%
+  );
   box-sizing: border-box;
   animation: rotation 1s linear infinite;
 }
@@ -563,8 +571,8 @@ select {
 .breed-text-info {
   display: flex;
   flex-direction: column;
-  gap: 16px;
+  gap: 20px;
 
-  width: 400px;
+  width: 500px;
   padding: 20px;
 }

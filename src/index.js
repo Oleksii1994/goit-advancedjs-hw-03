@@ -1,50 +1,67 @@
 import SlimSelect from 'slim-select';
 import { fetchBreeds, fetchCatByBreed } from './js/cat-api';
 
-import iziToast from 'izitoast';
-import 'izitoast/dist/css/iziToast.min.css';
-
-// iziToast.error({
-//   message: 'Oops! Something went wrong! Try reloading the page!',
-//   position: 'topRight',
-// });
 const loader = document.querySelector('.loader');
 const select = document.querySelector('.breed-select');
 const catInfoBox = document.querySelector('.cat-info');
 
-let isLoading = true;
+let isFirstSelect = true;
 
-select.classList.add('is-hidden');
-catInfoBox.classList.add('is-hidden');
 loader.classList.remove('is-hidden');
-
-const newSelect = fetchBreeds().then(dataFromApi => {
-  // Використовуйте dataFromApi для ініціалізації SlimSelect або інших завдань
-  new SlimSelect({
-    select: '#single',
-    data: dataFromApi.map(breed => ({ text: breed.name, value: breed.id })),
-  });
-  loader.classList.add('is-hidden');
-  select.classList.remove('is-hidden');
-});
 
 select.addEventListener('change', onChange);
 
+const breedsList = fetchBreeds()
+  .then(dataFromApi => {
+    if (!dataFromApi) {
+      select.classList.add('is-hidden');
+      loader.classList.add('is-hidden');
+      throw new Error();
+    }
+    const newSelect = new SlimSelect({
+      select: '#single',
+
+      data: dataFromApi.map(breed => ({ text: breed.name, value: breed.id })),
+    });
+
+    loader.classList.add('is-hidden');
+    select.classList.remove('is-hidden');
+  })
+  .catch(error => console.log(error));
+
 function onChange(event) {
   event.preventDefault();
+  loader.classList.remove('is-hidden');
   catInfoBox.innerHTML = '';
 
+  if (!breedsList) {
+    select.classList.add('is-hidden');
+    return;
+  }
+
+  if (isFirstSelect) {
+    isFirstSelect = false;
+    return;
+  }
+
   const { value } = event.currentTarget;
-  const infoAboutBreed = fetchCatByBreed(value).then(data => {
-    console.log(data[0].breeds);
-    catInfoBox.insertAdjacentHTML('beforeend', createBreedCard(data));
-    catInfoBox.classList.remove('is-hidden');
-  });
+  fetchCatByBreed(value)
+    .then(data => {
+      if (!data) {
+        loader.classList.add('is-hidden');
+        throw new Error();
+      }
+      catInfoBox.insertAdjacentHTML('beforeend', createBreedCardMarkup(data));
+      catInfoBox.classList.remove('is-hidden');
+      loader.classList.add('is-hidden');
+    })
+    .catch(error => console.log(error.message));
 }
 
-function createBreedCard(data) {
+function createBreedCardMarkup(data) {
   const { url } = data[0];
   const { description, name, temperament } = data[0].breeds[0];
-  const markup = `<img src="${url}" alt="${name} cat" width="400" loading="lazy"/><div class="breed-text-info"><h1>${name}</h1><p class="description">${description}</p><p><strong>Temperament:</strong> ${temperament}</p></div>`;
+
+  const markup = `<img src="${url}" alt="${name} cat" width="400" height="auto"/><div class="breed-text-info"><h1>${name}</h1><p class="description">${description}</p><p><strong>Temperament:</strong> ${temperament}</p></div>`;
   return markup;
 }
