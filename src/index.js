@@ -1,4 +1,6 @@
 import SlimSelect from 'slim-select';
+import iziToast from 'izitoast';
+import 'izitoast/dist/css/iziToast.min.css';
 import { fetchBreeds, fetchCatByBreed } from './js/cat-api';
 
 const loader = document.querySelector('.loader');
@@ -11,7 +13,7 @@ loader.classList.remove('is-hidden');
 
 select.addEventListener('change', onChange);
 
-const breedsList = fetchBreeds()
+fetchBreeds()
   .then(dataFromApi => {
     if (!dataFromApi) {
       select.classList.add('is-hidden');
@@ -27,17 +29,20 @@ const breedsList = fetchBreeds()
     loader.classList.add('is-hidden');
     select.classList.remove('is-hidden');
   })
-  .catch(error => console.log(error));
+  .catch(error => {
+    console.log(error.message);
+    loader.classList.add('is-hidden');
+    select.classList.add('is-hidden');
+    iziToast.error({
+      message: 'Oops! Something went wrong! Try to reload the page!',
+      position: 'topRight',
+    });
+  });
 
 function onChange(event) {
   event.preventDefault();
   loader.classList.remove('is-hidden');
   catInfoBox.innerHTML = '';
-
-  if (!breedsList) {
-    select.classList.add('is-hidden');
-    return;
-  }
 
   if (isFirstSelect) {
     isFirstSelect = false;
@@ -55,7 +60,15 @@ function onChange(event) {
       catInfoBox.classList.remove('is-hidden');
       loader.classList.add('is-hidden');
     })
-    .catch(error => console.log(error.message));
+    .catch(error => {
+      console.log(error.message);
+      loader.classList.add('is-hidden');
+      iziToast.error({
+        message:
+          'Oops! Something went wrong! Try to search another breed or reload the page',
+        position: 'topRight',
+      });
+    });
 }
 
 function createBreedCardMarkup(data) {
